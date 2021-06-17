@@ -6,7 +6,7 @@ import Spinner from "./spinner";
 // Loacal import ends
 
 const LevelChart = (props) => {
-  const { chartData } = { ...props };
+  let { chartData } = { ...props };
   return (
     <div className="level-wise-chart">
       <Chart

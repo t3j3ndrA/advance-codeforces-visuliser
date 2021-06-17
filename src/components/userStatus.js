@@ -8,7 +8,10 @@ import VerdictChart from "./verdictChart";
 import LanguageUsedChart from "./languageChart";
 import LevelChart from "./levelChart";
 import TagwiseChart from "./tagwiseChart";
+import ZeroSolved from "./zeroSolved";
 // Local import closed
+
+let totalSolvedProblems = 0;
 
 const UserDetails = (props) => {
   const { handle } = { ...props };
@@ -21,6 +24,7 @@ const UserDetails = (props) => {
   const [levelData, setLevelData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
+  const [zeroSolved, setZeroSolved] = useState(false);
   async function fetchUserInfo() {
     let stage1 = await fetch(url);
     let stage2 = await stage1.json();
@@ -28,6 +32,11 @@ const UserDetails = (props) => {
     // checking for fetch error
     if (stage2["status"] === "FAILED") {
       setIsError(true);
+      return;
+    }
+    if (stage2["status"] === "OK" && stage2["result"].length === 0) {
+      setZeroSolved(true);
+
       return;
     }
     calculateAllChartResult(stage2["result"]);
@@ -83,7 +92,7 @@ const UserDetails = (props) => {
 
     // filtering for operations on solved problems only
     const solvedProblems = param.filter((obj) => obj["verdict"] === "OK");
-
+    totalSolvedProblems = solvedProblems.length;
     solvedProblems.forEach((obj) => {
       // To get problem object from submission object
       const problem = obj["problem"];
@@ -150,6 +159,7 @@ const UserDetails = (props) => {
     setRatingsdata(chartDataArray);
 
     // setting up levelwise problem solved
+    tmpLevels = new Map([...tmpLevels.entries()].sort());
     chartDataArray = [];
     allKeys = [...tmpLevels.keys()];
     allValues = [...tmpLevels.values()];
@@ -170,13 +180,22 @@ const UserDetails = (props) => {
   return (
     <>
       {isError && <Error handle={handle} />}
-      {isLoading && !isError && <Spinner />}
-      {!isLoading && !isError && <TagwiseChart chartData={chartData} />}
-      {!isLoading && !isError && <RatingWiseChart chartData={ratingsData} />}
-      {!isLoading && !isError && <LevelChart chartData={levelData} />}
+      {zeroSolved && <ZeroSolved handle={handle} />}
+      {isLoading && !isError && !zeroSolved && <Spinner />}
+      {!isLoading && !isError && !zeroSolved && (
+        <TagwiseChart chartData={chartData} />
+      )}
+      {!isLoading && !isError && !zeroSolved && (
+        <RatingWiseChart chartData={ratingsData} />
+      )}
+      {!isLoading && !isError && !zeroSolved && (
+        <LevelChart chartData={levelData} />
+      )}
       <div className="side-by-side-chart">
-        {!isLoading && !isError && <VerdictChart chartData={verdictData} />}
-        {!isLoading && !isError && (
+        {!isLoading && !isError && !zeroSolved && (
+          <VerdictChart chartData={verdictData} />
+        )}
+        {!isLoading && !isError && !zeroSolved && (
           <LanguageUsedChart chartData={languageData} />
         )}
       </div>
@@ -184,4 +203,4 @@ const UserDetails = (props) => {
   );
 };
 
-export default UserDetails;
+export { UserDetails };

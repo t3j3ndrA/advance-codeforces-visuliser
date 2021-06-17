@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 // Local file imports begins
 
-import UserStatus from "./components/userStatus"; // rating wise chart+verdict chart + tagwise chart + languages used chart
+import { UserDetails } from "./components/userStatus"; // rating wise chart+verdict chart + tagwise chart + languages used chart
 import UserInfo from "./components/userInfo"; // Two tables 1. Info of handle, 2. Contenst of handle
 // Local file imports closed
 
@@ -42,7 +42,7 @@ function App() {
           {fetchStatus && <UserInfo handle={handleName} />}
         </div>
         <div className="user-status">
-          {fetchStatus && <UserStatus handle={handleName} />}
+          {fetchStatus && <UserDetails handle={handleName} />}
         </div>
         <div className="developed-by">
           {fetchStatus && <p> Developer : t3j3ndrA</p>}
